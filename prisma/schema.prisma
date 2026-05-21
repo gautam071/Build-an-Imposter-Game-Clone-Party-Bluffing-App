@@ -1,0 +1,68 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Room {
+  id               String       @id @default(uuid())
+  code             String       @unique
+  status           String       @default("waiting") // waiting, role_reveal, clue_phase, discussion, voting, reveal, scoreboard
+  topicPack        String       @default("general")
+  secretTopic      String       @default("")
+  imposterId       String       @default("")
+  activeRound      Int          @default(0)
+  activeClueIndex  Int          @default(0)
+  timerSeconds     Int          @default(0)
+  lastActive       DateTime     @default(now()) @updatedAt
+  players          Player[]
+  messages         Message[]
+  rounds           Round[]
+}
+
+model Player {
+  id           String   @id @default(uuid())
+  name         String
+  avatar       String   @default("🥸")
+  score        Int      @default(0)
+  isHost       Boolean  @default(false)
+  isConnected  Boolean  @default(true)
+  isReady      Boolean  @default(false)
+  clue         String?
+  votedForId   String?
+  role         String?  // imposter, player
+  roomId       String
+  room         Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+}
+
+model Round {
+  id          String   @id @default(uuid())
+  roundNumber Int
+  secretTopic String
+  imposterId  String
+  votes       Vote[]
+  roomId      String
+  room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+}
+
+model Vote {
+  id          String   @id @default(uuid())
+  voterId     String   // Player ID
+  candidateId String   // Suspect Player ID
+  roundId     String
+  round       Round    @relation(fields: [roundId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  senderId   String
+  senderName String
+  text       String
+  isSystem   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  roomId     String
+  room       Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+}

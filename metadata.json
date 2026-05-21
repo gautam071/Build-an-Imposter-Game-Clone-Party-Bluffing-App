@@ -1,0 +1,6 @@
+{
+  "name": "Imposter Party Game",
+  "description": "A thrilling real-time multiplayer social deduction party game. Find the Imposter who doesn't know the secret topic, or blend in if it's you!",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
